@@ -13,9 +13,6 @@ void update();
 void display();
 void delete();*/
 
-typedef enum {sunday, monday, tuesday, wednesday, thursday, friday, saturday} ;
-typedef enum {january, february, march, april, may, june, july, august, september, october, november, december} ;
-
 typedef struct artist
 {
     char stageNAme[20];
