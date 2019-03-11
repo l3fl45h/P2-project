@@ -5,25 +5,38 @@
 #include<time.h>
 #include<ctype.h>
 
-void verification();
-int clerkmenu();
-/*int managermenu();
+void adduser();
+int verification();
+void run(int c, int i);
+int ValidatedLogin(char *uname, char *pword, int i);
+int managermenu();
+//int clerkmenu();
+/*
 void addartist();
-void update();
-void display();
-void delete();*/
+void updateartistinfo();
+void addBooking();
+void updateBooking();
+void addFoundation();
+void updateFoundation();
+void generatereport();
+*/
 
-typedef struct artist
+//typedef enum {january=1, february, march, april, may, june, july, august, september, october, november, december} ;
+//typedef enum {Manager=1, Clerk};
+
+typedef union Rate
 {
-    char stageNAme[20];
-    char realName[30];
-    int accountNum;
-    float accountBal;
-    long int telephone;
-    float earningPerYr;
-} artist;
+    float lrate;
+    float frate;
+} rate;
 
-typedef struct booking
+typedef struct Login
+{
+    char uname[20];
+    char pword[20];
+} login; 
+
+typedef struct Bookings
 {
     int bookingNum;
     char type;
@@ -34,86 +47,368 @@ typedef struct booking
     char location[50];
     char guide[40];
     char flightInfo[30];
-    float localRate; 
-    float foreignRate;
-    artist art;
-} book;
+    rate rateinfo;
+} bookings;
 
-typedef struct foundation
+typedef struct Foundation
 {
     int fAccountNum;
     float balance;
     char majorCurCharity[40];
-    artist art;
-} found;
+} foundations;
 
+typedef struct Artist
+{
+    char stageName[20];
+    char realName[30];
+    int accountNum;
+    float accountBal;
+    long int telephone;
+    float earningPerYr;
+    bookings booking;
+    foundations foundation;
+} artist;
+
+login loginfo;
 artist artarr[20];
-book bookarr[20];
-found foundarr[20];
+bookings bookarr[20];
+foundations foundarr[20];
+
+int curr = 0;
+
+FILE *lfp;
+FILE *fp;
 
 int main()
 {
-    int choice;
+    int choice, id;
 
-    verification();
+    //adduser();
+    id = verification();
+    printf("Lets goo\n");
+    system("pause");
 
-    do
+    /*if(id == 1)
+        choice = managermenu();
+    else
+    if(id == 2)
+        //choice = clerkmenu();
+    
+    run(choice, id);
+
+    /*do
     {
         choice = clerkmenu();
+        run(choice);
 
-    } while (choice != 6);
+    } while (choice != 6);*/
     
 
     return 0;
 }
 
-void verification()
-{
-    int pin, att = 3;
-    char username[20];
-
-    do
-	{
-        printf("Attempts left : %d\n", att);
-        printf("Enter username : ");
-        scanf("%s", username);
-		printf("Enter password : ");
-		scanf("%d", &pin);
-		if ((pin != 1520)&&(strcmpi(username, "everald") != 0))
-		printf("PLEASE ENTER VALID PASSWORD\n");
-        att--;
-        system("cls");
-	}while (((pin != 1520)&&(strcmpi(username, "everald") != 0) == 0)&&(att != 0));
-
-    if(att == 0)
-    {
-        printf("You have exceeded the amount of attempts");
-        exit(0);
-    }
-
-    return;
-}
-
-int clerkmenu()
+int managermenu()
 {
     int pick;
 
     system("cls");
-    printf("Clerk Menu\n");
-    printf("1. View Artist Information\n");
-    printf("2. Add artist booking\n");
-    printf("3. Update artist booking\n");
-    printf("4. Display artist booking\n");
-    printf("5. Generate report\n");
-    printf("6. Quit\n\n");
+    printf("************************************************************\n");
+	printf("*                                                          *\n");
+	printf("*                      MAIN MENU                           *\n");
+	printf("*                                                          *\n");
+	printf("************************************************************\n");
+	printf("*                                                          *\n");
+	printf("*               1.Add Artist Information                   *\n"); 
+	printf("*                                                          *\n");
+	printf("*               2.Display Artist Information               *\n");
+	printf("*                                                          *\n");
+	printf("*               3.Update Artist Information                *\n");
+	printf("*                                                          *\n");
+    printf("*               4.Display All Artist Information           *\n");
+    printf("*                                                          *\n");
+    printf("*               5.Generate Report                          *\n");
+    printf("*                                                          *\n");
+    printf("*               6.Delete Artist Information                *\n");
+    printf("*                                                          *\n");
+	printf("************************************************************\n");
+	printf("*                                                          *\n");
+	printf("*                      7.Exit                              *\n");
+	printf("*                                                          *\n");
+	printf("************************************************************\n");
     
-    printf("Enter your choice: ");
+    printf("Enter selection: ");
     scanf("%d", &pick);
 
     return pick;
 }
 
+void run(int c, int i)
+{
+    switch(c)
+    {
+        case 1: //addartist(); break;
 
+        case 2: break;
+    }
+}
+
+void adduser()
+{
+    int midnum, cidnum, choice;
+
+    printf("\nChoose user to be added:\n");
+    printf("1. Manager\n");
+    printf("2. Clerk\n\n");
+    printf("Choice: ");
+    scanf("%d", &choice);
+
+    if(choice == 1)
+    {
+        lfp = fopen("ManagerFile.dat","ab+");
+
+        printf("Enter username: ");
+        scanf("%s", &loginfo.uname);
+
+        printf("Enter password: ");
+        scanf("%s", &loginfo.pword);
+
+        fseek(lfp, sizeof(struct Login), SEEK_SET);
+        fwrite(&loginfo, sizeof(struct Login), 1, lfp);
+        fclose(lfp);
+    }
+    else
+    if(choice == 2)
+    {
+        lfp = fopen("ClerkFile.dat","ab+");
+
+        printf("Enter username: ");
+        scanf("%s", &loginfo.uname);
+
+        printf("Enter password: ");
+        scanf("%s", &loginfo.pword);
+
+        fseek(lfp, sizeof(struct Login), SEEK_SET);
+        fwrite(&loginfo, sizeof(struct Login), 1, lfp);
+        fclose(lfp);
+    }
+    else
+        printf("Invalid entry.");
+    
+    return;
+}
+
+int verification()
+{
+    int id, att=3, p;
+    char uname[50], pword[50];
+
+    printf("1. Manager\n");
+    printf("2. Clerk\n\n");
+    printf("Choice: ");
+    scanf("%d", &id);
+
+    while(att != 0)
+    {
+        p=0;
+        printf("Enter username : ");
+        scanf("%s", uname);
+        printf("Enter password : ");
+        
+        do
+        { 
+            pword[p]=getch(); 
+            
+            if(pword[p]!='\r')
+            { 
+                printf("*"); 
+            } 
+            p++; 
+
+        }while(pword[p-1]!='\r'); 
+        pword[p-1]='\0';
+
+        if(ValidatedLogin(uname, pword, id) == 0)
+        {
+            return id;
+        }
+        else
+        {
+            att--;
+            if(att == 0)
+            {
+                printf("\nYou have exceeded the number of attempts.\n");
+                exit(0);
+            }
+            else
+                printf("\nInvalid login credentials. Attempts left: %d\n\n", att);
+        }
+    }
+
+    return id;
+}
+
+int ValidatedLogin(char *uname, char *pword, int i)
+{
+    int result;
+
+    if(i==1)
+        lfp = fopen("ManagerFile.dat","rb+");
+    else 
+    if(i==2)
+        lfp = fopen("ClerkFile.dat","rb+");
+    
+    while((fread(&loginfo, sizeof(struct Login), 1, lfp)))
+    {
+        if((strcmpi(loginfo.uname,uname) == 0) && (strcmpi(loginfo.pword,pword) == 0))
+        {
+            result = 0;
+            return result;
+        }
+        else
+        {
+            result = -1;
+        }
+    }
+
+    return result;    
+}
+
+/*void clerkupdateartistinfo()
+{
+    int choice;
+    switch(choice)
+    {
+        case 1: updateBooking(); break;
+
+        case 2: updateFoundation(); break;
+
+        case 3: 
+    }
+}*/
+
+
+/*void addartist()
+{
+    char opt;
+
+    fp = fopen("artistinfo.dat","rb+");
+
+    artarr[curr].accountNum = (curr+1) * 1111;
+
+    fseek( fp, ( idnum - 1 ) * sizeof( struct client_info ), SEEK_SET ); //searches for the record in file
+	fread( &cli, sizeof( struct client_info ), 1, fp ); //reads the record in file 
+
+    printf("Enter artist real name: ");
+    scanf("%s", artarr[curr].realName);
+
+    printf("\nEnter artist stage name: ");
+    scanf("%s", artarr[curr].stageName);
+
+    printf("\nEnter artist telephone number: ");
+    scanf("%d", &artarr[curr].telephone);
+
+    printf("\nEnter artist yearly earnings: $");
+    scanf("%f", &artarr[curr].earningPerYr);
+
+    printf("\nEnter artist account balance: $");
+    scanf("%d", &artarr[curr].accountBal);
+
+
+
+    /*menu2();
+    
+    fflush(stdin);
+    scanf("%c", &opt);
+
+    if(opt == 'a')
+    {
+        arr[curr].Type = 's';
+        printf("\nEnter balance: $");
+        scanf("%f", &arr[curr].amount.balance);
+    }
+    else
+    if(opt == 'b')
+    {
+        arr[curr].Type = 'c';
+        printf("\nEnter balance: $");
+        scanf("%f", &arr[curr].amount.overdraft);
+    }
+    else
+        printf("Invalid choice");
+    
+    curr++;
+
+    return;    
+}
+
+void updateartist()
+{
+
+}
+
+void addBooking()
+{
+    int anum;
+
+    printf("Enter artist account number: ");
+    scanf("%d", &anum);
+
+    printf("Enter booking number: ");
+    scanf("%d", &bookarr[curr].bookingNum);
+
+    printf("Enter booking type: ");
+    scanf("%s", bookarr[curr].type);
+
+    printf("Enter booking day, month and year: ");
+    scanf("%d %d %d", &bookarr[curr].day, &bookarr[curr].month. &bookarr[curr].year);
+
+    printf("Enter booking hotel name: ");
+    scanf("%s", bookarr[curr].hotel);
+
+    printf("Enter booking location: ");
+    scanf("%s", bookarr[curr].location);
+
+    printf("Enter booking location: ");
+    scanf("%s", bookarr[curr].);
+
+    printf("Enter booking location: ");
+    scanf("%s", bookarr[curr].location);
+
+    printf("Enter booking location: ");
+    scanf("%s", bookarr[curr].location);
+
+    return;
+}
+
+void updateBooking()
+{
+
+}
+
+void addFoundation()
+{
+    int anum;
+    printf("Enter artist account number: ");
+    scanf("%d", &anum);
+
+    printf("Enter foundation account number: ");
+    scanf("%d", &foundarr[curr].fAccountNum);
+
+    printf("Enter foundation name: ");
+    scanf("%s", foundarr[curr].majorCurCharity);
+
+    printf("Enter foundation balance: $");
+    scanf("%f", &foundarr[curr].balance);
+
+    return;
+}
+
+void updateFoundation()
+{
+
+}
+
+*/
 
 
 
