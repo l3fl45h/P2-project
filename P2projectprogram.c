@@ -272,7 +272,7 @@ void addartist()
         printf("\nEnter artist stage name: ");
         scanf("%s", sname);
 
-        for(i=; i<=curr; i++)
+        for(i=0; i<=MAX_ART; i++)
         {
             //fseek(afp, (anum-i)*sizeof(struct Artist), SEEK_SET);
             while((fread(&artarr[i], sizeof(struct Artist), 1, afp))&&(i!=curr))
@@ -321,7 +321,7 @@ void addartist()
     return;    
 }
 
-void artistdatabase(int anum)
+void artistdatabase(int anum, int c)
 {
     
 	afp = fopen("ArtistInfo.bin","rb");
@@ -345,7 +345,7 @@ void artistdatabase(int anum)
 
 void displayartist()
 {
-    int anum;
+    int anum, i;
 
     if ((afp = fopen("ArtistInfo.bin","rb")) == NULL )
 	{
@@ -363,9 +363,12 @@ void displayartist()
         scanf("%d", &anum);
                             
         fseek(afp, (anum - 1)*sizeof(struct Artist), SEEK_SET);
-        fread(&artarr[curr], sizeof(struct Artist), 1, afp);
+
+        cfp = fopen("CurrentPosition.txt","r");
+        for(i=0; i<curr; i++)
+            fread(&artarr[i], sizeof(struct Artist), 1, afp);
         
-        if (artarr[curr].accountNum != anum)
+        if (artarr[i].accountNum != anum)
         {
             printf("\n\aAccount does not exist.\n");
             system("pause");
@@ -382,6 +385,7 @@ void displayartist()
             printf("Bookings :\n\n");
         }
         
+        fclose(cfp);
         fclose(afp);
         system("pause");
     }
@@ -522,4 +526,3 @@ void updateFoundation()
 }
 
 */
-
