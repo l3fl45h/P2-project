@@ -4,15 +4,19 @@
 #include<string.h>
 #include<time.h>
 #include<ctype.h>
+#define MAX_ART 20
 
 void adduser();
 int verification();
 void run(int c, int i);
 int ValidatedLogin(char *uname, char *pword, int i);
 int managermenu();
+void addartist();
+void artistdatabase(int anum, int c);
+void displayartist();
 //int clerkmenu();
 /*
-void addartist();
+
 void updateartistinfo();
 void addBooking();
 void updateBooking();
@@ -60,7 +64,8 @@ typedef struct Foundation
 typedef struct Artist
 {
     char stageName[20];
-    char realName[30];
+    char fName[30];
+    char lName[30];
     int accountNum;
     float accountBal;
     long int telephone;
@@ -74,127 +79,33 @@ artist artarr[20];
 bookings bookarr[20];
 foundations foundarr[20];
 
-int curr = 0;
+int curr;
 
 FILE *lfp;
-FILE *fp;
+FILE *cfp;
+FILE *afp;
+FILE *aptr;
 
 int main()
 {
     int choice, id;
 
     //adduser();
+    //remove comments form adduser function to add manager/clerk
     id = verification();
-    printf("Lets goo\n");
-    system("pause");
 
-    /*if(id == 1)
-        choice = managermenu();
-    else
-    if(id == 2)
-        //choice = clerkmenu();
-    
-    run(choice, id);
-
-    /*do
+    do
     {
-        choice = clerkmenu();
-        run(choice);
-
-    } while (choice != 6);*/
-    
+        if(id == 1)
+            choice = managermenu();
+        //else
+        //if(id == 2)
+            //choice = clerkmenu();
+        
+        run(choice, id);
+    } while (choice!= 7);
 
     return 0;
-}
-
-int managermenu()
-{
-    int pick;
-
-    system("cls");
-    printf("************************************************************\n");
-	printf("*                                                          *\n");
-	printf("*                      MAIN MENU                           *\n");
-	printf("*                                                          *\n");
-	printf("************************************************************\n");
-	printf("*                                                          *\n");
-	printf("*               1.Add Artist Information                   *\n"); 
-	printf("*                                                          *\n");
-	printf("*               2.Display Artist Information               *\n");
-	printf("*                                                          *\n");
-	printf("*               3.Update Artist Information                *\n");
-	printf("*                                                          *\n");
-    printf("*               4.Display All Artist Information           *\n");
-    printf("*                                                          *\n");
-    printf("*               5.Generate Report                          *\n");
-    printf("*                                                          *\n");
-    printf("*               6.Delete Artist Information                *\n");
-    printf("*                                                          *\n");
-	printf("************************************************************\n");
-	printf("*                                                          *\n");
-	printf("*                      7.Exit                              *\n");
-	printf("*                                                          *\n");
-	printf("************************************************************\n");
-    
-    printf("Enter selection: ");
-    scanf("%d", &pick);
-
-    return pick;
-}
-
-void run(int c, int i)
-{
-    switch(c)
-    {
-        case 1: //addartist(); break;
-
-        case 2: break;
-    }
-}
-
-void adduser()
-{
-    int midnum, cidnum, choice;
-
-    printf("\nChoose user to be added:\n");
-    printf("1. Manager\n");
-    printf("2. Clerk\n\n");
-    printf("Choice: ");
-    scanf("%d", &choice);
-
-    if(choice == 1)
-    {
-        lfp = fopen("ManagerFile.dat","ab+");
-
-        printf("Enter username: ");
-        scanf("%s", &loginfo.uname);
-
-        printf("Enter password: ");
-        scanf("%s", &loginfo.pword);
-
-        fseek(lfp, sizeof(struct Login), SEEK_SET);
-        fwrite(&loginfo, sizeof(struct Login), 1, lfp);
-        fclose(lfp);
-    }
-    else
-    if(choice == 2)
-    {
-        lfp = fopen("ClerkFile.dat","ab+");
-
-        printf("Enter username: ");
-        scanf("%s", &loginfo.uname);
-
-        printf("Enter password: ");
-        scanf("%s", &loginfo.pword);
-
-        fseek(lfp, sizeof(struct Login), SEEK_SET);
-        fwrite(&loginfo, sizeof(struct Login), 1, lfp);
-        fclose(lfp);
-    }
-    else
-        printf("Invalid entry.");
-    
-    return;
 }
 
 int verification()
@@ -202,6 +113,7 @@ int verification()
     int id, att=3, p;
     char uname[50], pword[50];
 
+    system("cls");
     printf("1. Manager\n");
     printf("2. Clerk\n\n");
     printf("Choice: ");
@@ -210,7 +122,7 @@ int verification()
     while(att != 0)
     {
         p=0;
-        printf("Enter username : ");
+        printf("\nEnter username : ");
         scanf("%s", uname);
         printf("Enter password : ");
         
@@ -252,10 +164,10 @@ int ValidatedLogin(char *uname, char *pword, int i)
     int result;
 
     if(i==1)
-        lfp = fopen("ManagerFile.dat","rb+");
+        lfp = fopen("ManagerFile.bin","rb+");
     else 
     if(i==2)
-        lfp = fopen("ClerkFile.dat","rb+");
+        lfp = fopen("ClerkFile.bin","rb+");
     
     while((fread(&loginfo, sizeof(struct Login), 1, lfp)))
     {
@@ -273,6 +185,259 @@ int ValidatedLogin(char *uname, char *pword, int i)
     return result;    
 }
 
+void run(int c, int i)
+{
+    switch(c)
+    {
+        case 1: addartist(); break;
+
+        case 2: displayartist(); break;
+    }
+
+    return;
+}
+
+int managermenu()
+{
+    int pick;
+
+    system("cls");
+    printf("************************************************************\n");
+	printf("*                                                          *\n");
+	printf("*                      MAIN MENU                           *\n");
+	printf("*                                                          *\n");
+	printf("************************************************************\n");
+	printf("*                                                          *\n");
+	printf("*               1.Add Artist Information                   *\n"); 
+	printf("*                                                          *\n");
+	printf("*               2.Display Artist Information               *\n");
+	printf("*                                                          *\n");
+	printf("*               3.Update Artist Information                *\n");
+	printf("*                                                          *\n");
+    printf("*               4.Display All Artist Information           *\n");
+    printf("*                                                          *\n");
+    printf("*               5.Generate Report                          *\n");
+    printf("*                                                          *\n");
+    printf("*               6.Delete Artist Information                *\n");
+    printf("*                                                          *\n");
+	printf("************************************************************\n");
+	printf("*                                                          *\n");
+	printf("*                      7.Exit                              *\n");
+	printf("*                                                          *\n");
+	printf("************************************************************\n");
+    
+    printf("Enter selection: ");
+    scanf("%d", &pick);
+
+    return pick;
+}
+
+void addartist()
+{
+    char opt, sname[20];
+    int anum, c, i;
+
+    system("cls");
+
+    if((cfp = fopen("CurrentPosition.txt","r")) == NULL)
+    {
+        cfp = fopen("CurrentPosition.txt", "w");
+        curr = 0;
+        fprintf(cfp,"%d", curr);
+        fclose(cfp);
+    }
+    
+    cfp = fopen("CurrentPosition.txt","r");
+    fscanf(cfp,"%d", &curr);
+    c = curr;
+    anum = (curr+1) + 10000;
+    fclose(cfp);
+
+    if(c != MAX_ART)
+    {
+        cfp = fopen("CurrentPosition.txt","w");
+
+        afp = fopen("ArtistInfo.bin","ab+");
+        fseek(afp, (anum-1)*sizeof(struct Artist), SEEK_SET); 
+        fread(&artarr[c], sizeof( struct Artist ), 1, afp); 
+
+        artarr[c].accountNum = anum;
+
+        printf("Enter artist first name: ");
+        scanf("%s", &artarr[c].fName);
+
+        printf("\nEnter artist last name: ");
+        scanf("%s", &artarr[c].lName);
+
+        printf("\nEnter artist stage name: ");
+        scanf("%s", sname);
+
+        for(i=; i<=curr; i++)
+        {
+            //fseek(afp, (anum-i)*sizeof(struct Artist), SEEK_SET);
+            while((fread(&artarr[i], sizeof(struct Artist), 1, afp))&&(i!=curr))
+            {
+                while((strcmpi(sname, artarr[i].stageName)) == 0)
+                {
+                    printf("\nStage name is already taken. Enter unique stage name : ");
+                    scanf("%s", sname);
+                }
+                //i++;
+            }
+        }
+
+        /*while((fread(&artarr[c], sizeof(struct Artist), 1, afp)))
+        {
+            if((strcmpi(sname, artarr[c].stageName)) == 0)
+                while((strcmpi(sname, artarr[c].stageName)) == 0)
+                {
+                    printf("\nStage name is already taken. Enter unique stage name : ");
+                    scanf("%s", sname);
+                }
+        }*/
+
+        strcpy(artarr[c].stageName, sname);
+
+        printf("\nEnter artist telephone number: ");
+        scanf("%d", &artarr[c].telephone);
+
+        printf("\nEnter artist yearly earnings: $");
+        scanf("%f", &artarr[c].earningPerYr);
+
+        printf("\nEnter artist account balance: $");
+        scanf("%f", &artarr[c].accountBal);
+
+        fseek( afp, ( anum - 1 ) * sizeof( struct Artist ), SEEK_SET ); //searches for the record in file
+        fread( &artarr[c], sizeof( struct Artist ), 1, afp ); //reads the record in file 
+        
+        curr+=1;
+        fprintf(cfp,"%d", curr);
+        
+        fclose(afp);
+        fclose(cfp);
+
+        artistdatabase(anum, c);
+    }
+    return;    
+}
+
+void artistdatabase(int anum)
+{
+    
+	afp = fopen("ArtistInfo.bin","rb");
+	fseek(afp, (anum - 1)*sizeof(struct Artist), SEEK_SET);
+	fread(&artarr[c], sizeof(struct Artist), 1, afp);
+	
+	aptr = fopen("ArtistInfo.txt","a");
+	
+	fprintf(aptr,"Account number                   : %d\n", artarr[c].accountNum);
+	fprintf(aptr,"Name                             : %s %s\n", artarr[c].fName, artarr[curr].lName);
+    fprintf(aptr,"Stage Name                       : %s\n", artarr[c].stageName);
+	fprintf(aptr,"Mobile number                    : (876)%d\n", artarr[c].telephone);
+	fprintf(aptr,"Earning per year                 : $%.2f\n", artarr[c].earningPerYr);
+	fprintf(aptr,"Account Balance                  : $%.2f\n\n", artarr[c].accountBal);
+	
+	fclose(afp);
+	fclose(aptr);
+	
+	return;
+}
+
+void displayartist()
+{
+    int anum;
+
+    if ((afp = fopen("ArtistInfo.bin","rb")) == NULL )
+	{
+		//displays the following if the file is empty
+		printf("\aFile could not open.\n");
+		printf("Press any key to go to the main menu....");
+		getch();
+		return;
+	}
+    else
+    {
+        afp = fopen("ArtistInfo.bin","rb+");
+
+        printf("Enter artist account number: ");
+        scanf("%d", &anum);
+                            
+        fseek(afp, (anum - 1)*sizeof(struct Artist), SEEK_SET);
+        fread(&artarr[curr], sizeof(struct Artist), 1, afp);
+        
+        if (artarr[curr].accountNum != anum)
+        {
+            printf("\n\aAccount does not exist.\n");
+            system("pause");
+            return;
+        }
+        else
+        {
+            printf("\nAccount number                 : %d\n", artarr[curr].accountNum);
+            printf("Name                             : %s %s\n", artarr[curr].fName, artarr[curr].lName );
+            printf("Stage n                          : %s\n", artarr[curr].stageName);
+            printf("Mobile number                    : (876)%d\n", artarr[curr].telephone);
+            printf("Earning per year                 : $%.2f\n", artarr[curr].earningPerYr);
+            printf("Account Balance                  : $%.2f\n\n", artarr[curr].accountBal);
+            printf("Bookings :\n\n");
+        }
+        
+        fclose(afp);
+        system("pause");
+    }
+    
+    return;
+}
+
+void adduser()
+{
+    int midnum, cidnum, choice;
+
+    printf("\nChoose user to be added:\n");
+    printf("1. Manager\n");
+    printf("2. Clerk\n\n");
+    printf("Choice: ");
+    scanf("%d", &choice);
+
+    if(choice == 1)
+    {
+        lfp = fopen("ManagerFile.bin","ab+");
+
+        printf("Enter username: ");
+        scanf("%s", &loginfo.uname);
+
+        printf("Enter password: ");
+        scanf("%s", &loginfo.pword);
+
+        fseek(lfp, sizeof(struct Login), SEEK_SET);
+        fwrite(&loginfo, sizeof(struct Login), 1, lfp);
+        fclose(lfp);
+    }
+    else
+    if(choice == 2)
+    {
+        lfp = fopen("ClerkFile.bin","ab+");
+
+        printf("Enter username: ");
+        scanf("%s", &loginfo.uname);
+
+        printf("Enter password: ");
+        scanf("%s", &loginfo.pword);
+
+        fseek(lfp, sizeof(struct Login), SEEK_SET);
+        fwrite(&loginfo, sizeof(struct Login), 1, lfp);
+        fclose(lfp);
+    }
+    else
+        printf("Invalid entry.");
+    
+    return;
+}
+
+
+
+
+
 /*void clerkupdateartistinfo()
 {
     int choice;
@@ -284,62 +449,10 @@ int ValidatedLogin(char *uname, char *pword, int i)
 
         case 3: 
     }
-}*/
-
-
-/*void addartist()
-{
-    char opt;
-
-    fp = fopen("artistinfo.dat","rb+");
-
-    artarr[curr].accountNum = (curr+1) * 1111;
-
-    fseek( fp, ( idnum - 1 ) * sizeof( struct client_info ), SEEK_SET ); //searches for the record in file
-	fread( &cli, sizeof( struct client_info ), 1, fp ); //reads the record in file 
-
-    printf("Enter artist real name: ");
-    scanf("%s", artarr[curr].realName);
-
-    printf("\nEnter artist stage name: ");
-    scanf("%s", artarr[curr].stageName);
-
-    printf("\nEnter artist telephone number: ");
-    scanf("%d", &artarr[curr].telephone);
-
-    printf("\nEnter artist yearly earnings: $");
-    scanf("%f", &artarr[curr].earningPerYr);
-
-    printf("\nEnter artist account balance: $");
-    scanf("%d", &artarr[curr].accountBal);
-
-
-
-    /*menu2();
-    
-    fflush(stdin);
-    scanf("%c", &opt);
-
-    if(opt == 'a')
-    {
-        arr[curr].Type = 's';
-        printf("\nEnter balance: $");
-        scanf("%f", &arr[curr].amount.balance);
-    }
-    else
-    if(opt == 'b')
-    {
-        arr[curr].Type = 'c';
-        printf("\nEnter balance: $");
-        scanf("%f", &arr[curr].amount.overdraft);
-    }
-    else
-        printf("Invalid choice");
-    
-    curr++;
-
-    return;    
 }
+
+
+
 
 void updateartist()
 {
@@ -369,7 +482,7 @@ void addBooking()
     scanf("%s", bookarr[curr].location);
 
     printf("Enter booking location: ");
-    scanf("%s", bookarr[curr].);
+    scanf("%s", bookarr[curr].location);
 
     printf("Enter booking location: ");
     scanf("%s", bookarr[curr].location);
@@ -409,20 +522,4 @@ void updateFoundation()
 }
 
 */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
