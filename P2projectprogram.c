@@ -16,9 +16,9 @@ int find(int anum);
 void display();
 void displayartist(int p);
 void updateartist();
-void addFoundation(int a);
-
-
+void addFoundation(int acurr);
+void loadRec();
+void storeRec();
 
 /*
 int clerkmenu();
@@ -78,8 +78,8 @@ typedef struct Artist
     float accountBal;
     long int telephone;
     float earningPerYr;
-    bookings booking;
-    foundations foundation;
+    bookings booking[MAX_ART];
+    foundations foundation[MAX_ART];
 } artist;
 
 login loginfo;
@@ -87,14 +87,15 @@ artist artarr[20];
 bookings bookarr[20];
 foundations foundarr[20];
 
-int acurr = 0;
-int bcurr = 0;
-int fcurr = 0;
+int acurr;
+int bcurr;
+int fcurr;
 
 FILE *lfp;
 FILE *cfp;
 FILE *afp;
 FILE *aptr;
+FILE *ffp;
 
 int main()
 {
@@ -103,7 +104,7 @@ int main()
     //adduser();
     //remove comments form adduser function to add manager/clerk
     id = verification();
-
+    loadRec();
     do
     {
         if(id == 1)
@@ -204,6 +205,8 @@ void run(int c, int i)
         case 2: display(); break;
 
         case 3: updateartist(); break;
+
+        //case 7: storeRec(); break;
     }
 
     return;
@@ -253,6 +256,19 @@ void addartist()
 
     if(acurr < MAX_ART)
     {
+        if((cfp = fopen("Count.txt","r")) == NULL)
+        {
+            cfp = fopen("Count.txt","a");
+            acurr = 0;
+            fprintf(cfp,"%d", acurr);
+        }
+        else
+        {
+            cfp = fopen("Count.txt","r");
+        }
+            
+        fscanf(cfp,"%d", &acurr);
+        
         artarr[acurr].accountNum = (acurr+1) + 10000;
 
         printf("Enter artist first name: ");
@@ -277,7 +293,7 @@ void addartist()
 
         strcpy(artarr[acurr].stageName, sname);
 
-        printf("\nEnter artist telephone number: ");
+        printf("\nEnter artist telephone number: (876)");
         scanf("%d", &artarr[acurr].telephone);
 
         printf("\nEnter artist yearly earnings: $");
@@ -286,24 +302,52 @@ void addartist()
         printf("\nEnter artist account balance: $");
         scanf("%f", &artarr[acurr].accountBal);
 
-        printf("Does artist have a charity foundation? (Y)es (N)o\n");
+        printf("\nDoes artist have a charity foundation? (Y)es (N)o: ");
         fflush(stdin);
-        scanf("%c", yn);
+        scanf("%c", &yn);
+
+        while((yn != 'y') && (yn != 'n'))
+        {
+            printf("\nInvalid entry. (Y)es (N)o: ");
+            fflush(stdin);
+            scanf("%c", &yn);
+        }
 
         if((yn == 'y')||(yn == 'Y'))
         {
-            addfoundation(acurr);
-        }
-        else
-        
+            addFoundation(acurr);
+        }        
 
         printf("\nNumber of artists in database: %d", acurr);
         acurr++;
+        fclose(cfp);
+        cfp = fopen("Count.txt","w");
+        fprintf(cfp,"%d", acurr);
+        storeRec();
+        fclose(cfp);
     }
     else
         printf("Artist database is full.");
 
     return;    
+}
+
+void addFoundation(int acurr)
+{
+    ffp = fopen("Foundation.txt","a");
+    fcurr = acurr;
+    system("pause");
+    printf("Enter foundation number: ");
+    scanf("%d", &artarr[acurr].foundation[fcurr].fAccountNum);
+
+    printf("Enter foundation name: ");
+    scanf("%s", artarr[acurr].foundation[fcurr].majorCurCharity);
+
+    printf("Enter foundation balance: $");
+    scanf("%f", &artarr[acurr].foundation[fcurr].balance);
+
+    fclose(ffp);
+    return;   
 }
 
 void updateartist()
@@ -370,37 +414,30 @@ void storeRec()
     if((afp==NULL))
 		printf("The file is not opened.\n");
 	else
-	    for (i=0; i<acurr; i++ )
-		    fprintf(afp,"%d %s %s %s %d $%.2f $%.2f\n", artarr[p].accountNum, artarr[p].fName, artarr[p].lName, artarr[p].stageName, artarr[p].telephone, artarr[p].earningPerYr, artarr[p].accountBal);
+		fprintf(afp,"%d %s %s %s %d $%.2f $%.2f\n", artarr[i].accountNum, artarr[i].fName, artarr[i].lName, artarr[i].stageName, artarr[i].telephone, artarr[i].earningPerYr, artarr[i].accountBal);
         
 	fclose(afp);
 }
 
 void loadRec()
 {
-     afp = fopen("ArtistInfo.txt","a");
+    afp = fopen("C:/Users/evera/OneDrive/Desktop/P2/P2_group_project/ArtistInfo.txt","r");
 	
-    if((afp==NULL))
-		printf("The file is not opened.\n");
+    if(afp==NULL)
+    {
+        return;
+    }	
 	else
         do
         {
-            /* code */
+            fscanf(afp,"%d %s %s %s %d $%.2f $%.2f\n", &artarr[acurr].accountNum, artarr[acurr].fName, artarr[acurr].lName, artarr[acurr].stageName, &artarr[acurr].telephone, &artarr[acurr].earningPerYr, &artarr[acurr].accountBal);
+            acurr++;
+
         } while (!feof(afp));
         
-	    for (i=0; i<acurr; i++ )
-		    fprintf(afp,"%d %s %s %s %d $%.2f $%.2f\n", artarr[p].accountNum, artarr[p].fName, artarr[p].lName, artarr[p].stageName, artarr[p].telephone, artarr[p].earningPerYr, artarr[p].accountBal);
-	else
-	{
-		do
-		{
-				fscanf(fptr,"%s %s %s \n",StudArr[studArrSize].Id,StudArr[studArrSize].name,StudArr[studArrSize].address);
-				studArrSize++;
-
-		}while(!feof(fptr));
-		}
-		fclose(fptr);
+		fclose(afp);
 }
+
 /*
 void artistdatabase(int anum, int c)
 {
