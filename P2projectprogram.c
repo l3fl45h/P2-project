@@ -266,7 +266,7 @@ void addartist()
         {
             cfp = fopen("Count.txt","r");
         }
-            
+        
         fscanf(cfp,"%d", &acurr);
         
         artarr[acurr].accountNum = (acurr+1) + 10000;
@@ -280,18 +280,25 @@ void addartist()
         printf("\nEnter artist stage name: ");
         scanf("%s", sname);
 
-    
-        for(i=0; i<acurr; i++)
+        i=0;
+        afp = fopen("ArtistInfo.txt","r");    
+        while(!feof(afp))
         {
+            fscanf(afp,"%s", artarr[i].stageName);
             if(strcmpi(sname, artarr[i].stageName) == 0)
+            {
                 while((strcmpi(sname, artarr[i].stageName) == 0))
                 {
                     printf("\nStage name is already taken. Enter unique stage name : ");
                     scanf("%s", sname);
                 }
+                i++;
+            }
+            else
+                strcpy(artarr[acurr].stageName, sname);
         }
-
-        strcpy(artarr[acurr].stageName, sname);
+        fclose(afp);
+        
 
         printf("\nEnter artist telephone number: (876)");
         scanf("%d", &artarr[acurr].telephone);
@@ -315,8 +322,24 @@ void addartist()
 
         if((yn == 'y')||(yn == 'Y'))
         {
-            addFoundation(acurr);
-        }        
+            printf("\nEnter foundation number: ");
+            scanf("%d", &artarr[acurr].foundation[acurr].fAccountNum);
+
+            printf("\nEnter foundation name: ");
+            scanf("%s", artarr[acurr].foundation[acurr].majorCurCharity);
+
+            printf("\nEnter foundation balance: $");
+            scanf("%f", &artarr[acurr].foundation[acurr].balance);
+
+            //addFoundation(int acurr);
+        }
+        else
+        {
+            //artarr[acurr].foundation[fcurr].fAccountNum = 0;
+            strcpy(artarr[acurr].foundation[acurr].majorCurCharity, "-");
+            //artarr[acurr].foundation[fcurr].balance = 0;
+        }
+             
 
         a = acurr;
         acurr++;
@@ -420,7 +443,7 @@ void storeRec(int a)
 		printf("The file is not opened.\n");
 	else
         for(i=a; i<acurr; i++)
-		    fprintf(afp,"%d %s %s %s %d $%.2f $%.2f\n", artarr[i].accountNum, artarr[i].fName, artarr[i].lName, artarr[i].stageName, artarr[i].telephone, artarr[i].earningPerYr, artarr[i].accountBal);
+		    fprintf(afp,"%d %s %s %s %d $%.2f $%.2f %d %s $%.2f\n", artarr[i].accountNum, artarr[i].fName, artarr[i].lName, artarr[i].stageName, artarr[i].telephone, artarr[i].earningPerYr, artarr[i].accountBal, artarr[i].foundation[i].fAccountNum, artarr[i].foundation[i].majorCurCharity, artarr[i].foundation[i].balance);
         
 	fclose(afp);
 }
