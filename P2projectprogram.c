@@ -18,7 +18,7 @@ void displayartist(int p);
 void updateartist();
 void addFoundation(int acurr);
 void loadRec();
-void storeRec();
+void storeRec(int a);
 
 /*
 int clerkmenu();
@@ -250,7 +250,7 @@ int managermenu()
 void addartist()
 {
     char sname[20], yn;
-    int i;
+    int i, a;
 
     system("cls");
 
@@ -318,17 +318,20 @@ void addartist()
             addFoundation(acurr);
         }        
 
-        printf("\nNumber of artists in database: %d", acurr);
+        a = acurr;
         acurr++;
+        printf("\nNumber of artists in database: %d\n", acurr);
+        
         fclose(cfp);
         cfp = fopen("Count.txt","w");
         fprintf(cfp,"%d", acurr);
-        storeRec();
+        storeRec(a);
         fclose(cfp);
     }
     else
         printf("Artist database is full.");
 
+    system("pause");
     return;    
 }
 
@@ -336,17 +339,19 @@ void addFoundation(int acurr)
 {
     ffp = fopen("Foundation.txt","a");
     fcurr = acurr;
-    system("pause");
-    printf("Enter foundation number: ");
+    
+    printf("\nEnter foundation number: ");
     scanf("%d", &artarr[acurr].foundation[fcurr].fAccountNum);
 
-    printf("Enter foundation name: ");
+    printf("\nEnter foundation name: ");
     scanf("%s", artarr[acurr].foundation[fcurr].majorCurCharity);
 
-    printf("Enter foundation balance: $");
+    printf("\nEnter foundation balance: $");
     scanf("%f", &artarr[acurr].foundation[fcurr].balance);
 
+    fprintf(ffp,"%d %s $%.2f\n", artarr[acurr].foundation[fcurr].fAccountNum, artarr[acurr].foundation[fcurr].majorCurCharity, artarr[acurr].foundation[fcurr].balance);
     fclose(ffp);
+
     return;   
 }
 
@@ -406,7 +411,7 @@ void displayartist(int p)
 	printf("\n");
 }
 
-void storeRec()
+void storeRec(int a)
 {
     int i;
     afp = fopen("ArtistInfo.txt","a");
@@ -414,7 +419,8 @@ void storeRec()
     if((afp==NULL))
 		printf("The file is not opened.\n");
 	else
-		fprintf(afp,"%d %s %s %s %d $%.2f $%.2f\n", artarr[i].accountNum, artarr[i].fName, artarr[i].lName, artarr[i].stageName, artarr[i].telephone, artarr[i].earningPerYr, artarr[i].accountBal);
+        for(i=a; i<acurr; i++)
+		    fprintf(afp,"%d %s %s %s %d $%.2f $%.2f\n", artarr[i].accountNum, artarr[i].fName, artarr[i].lName, artarr[i].stageName, artarr[i].telephone, artarr[i].earningPerYr, artarr[i].accountBal);
         
 	fclose(afp);
 }
