@@ -12,11 +12,11 @@ int ValidatedLogin(char *uname, char *pword, int i);
 void run(int c, int i);
 int managermenu();
 void addartist();
+void addBooking(int acurr);
 int find(int anum);
 void display();
 void displayartist(int p);
-void updateartist();
-void addFoundation(int acurr);
+int updateartist();
 void loadRec();
 void storeRec(int a);
 
@@ -39,7 +39,7 @@ void generatereport();
 typedef union Rate
 {
     float lrate;
-    float frate;
+    float orate;
 } rate;
 
 typedef struct Login
@@ -83,9 +83,9 @@ typedef struct Artist
 } artist;
 
 login loginfo;
-artist artarr[20];
-bookings bookarr[20];
-foundations foundarr[20];
+artist artarr[MAX_ART];
+bookings bookarr[MAX_ART];
+foundations foundarr[MAX_ART];
 
 int acurr;
 int bcurr;
@@ -96,6 +96,7 @@ FILE *cfp;
 FILE *afp;
 FILE *aptr;
 FILE *ffp;
+FILE *bfp;
 
 int main()
 {
@@ -309,18 +310,18 @@ void addartist()
         printf("\nEnter artist account balance: $");
         scanf("%f", &artarr[acurr].accountBal);
 
-        printf("\nDoes artist have a charity foundation? (Y)es (N)o: ");
+        printf("\nDoes artist have a charity foundation? (Y)es/(N)o: ");
         fflush(stdin);
         scanf("%c", &yn);
 
-        while((yn != 'y') && (yn != 'n'))
+        while((toupper(yn) != 'Y') && (toupper(yn) != 'N'))
         {
-            printf("\nInvalid entry. (Y)es (N)o: ");
+            printf("\nInvalid entry. (Y)es/(N)o: ");
             fflush(stdin);
             scanf("%c", &yn);
         }
 
-        if((yn == 'y')||(yn == 'Y'))
+        if(toupper(yn) == 'Y')
         {
             printf("\nEnter foundation number: ");
             scanf("%d", &artarr[acurr].foundation[acurr].fAccountNum);
@@ -330,16 +331,29 @@ void addartist()
 
             printf("\nEnter foundation balance: $");
             scanf("%f", &artarr[acurr].foundation[acurr].balance);
-
-            //addFoundation(int acurr);
         }
         else
         {
-            //artarr[acurr].foundation[fcurr].fAccountNum = 0;
+            artarr[acurr].foundation[fcurr].fAccountNum = 0;
             strcpy(artarr[acurr].foundation[acurr].majorCurCharity, "-");
-            //artarr[acurr].foundation[fcurr].balance = 0;
+            artarr[acurr].foundation[fcurr].balance = 0;
         }
-             
+
+        printf("\nDoes artist have any bookings? (Y)es/(N)o: ");
+        fflush(stdin);
+        scanf("%c", &yn);
+
+        while((toupper(yn) != 'Y') && (toupper(yn) != 'N'))
+        {
+            printf("\nInvalid entry. (Y)es/ (N)o: ");
+            fflush(stdin);
+            scanf("%c", &yn);
+        }
+
+        if(toupper(yn) == 'Y')
+        {
+            addBooking(acurr);
+        }
 
         a = acurr;
         acurr++;
@@ -358,30 +372,130 @@ void addartist()
     return;    
 }
 
-void addFoundation(int acurr)
+int updateartist()
 {
-    ffp = fopen("Foundation.txt","a");
-    fcurr = acurr;
-    
-    printf("\nEnter foundation number: ");
-    scanf("%d", &artarr[acurr].foundation[fcurr].fAccountNum);
+    int pick;
 
-    printf("\nEnter foundation name: ");
-    scanf("%s", artarr[acurr].foundation[fcurr].majorCurCharity);
+    system("cls");
+    printf("************************************************************\n");
+	printf("*                                                          *\n");
+	printf("*               1.Add Booking Information                  *\n"); 
+	printf("*                                                          *\n");
+	printf("*               2.Add Foundation Information               *\n");
+	printf("*                                                          *\n");
+	printf("*               3.Update Artist Information                *\n");
+	printf("*                                                          *\n");
+    printf("*               4.Display All Artist Information           *\n");
+    printf("*                                                          *\n");
+    printf("*               5.Generate Report                          *\n");
+    printf("*                                                          *\n");
+    printf("*               6.Delete Artist Information                *\n");
+    printf("*                                                          *\n");
+	printf("************************************************************\n");
+	printf("*                                                          *\n");
+	printf("*                      7.Exit                              *\n");
+	printf("*                                                          *\n");
+	printf("************************************************************\n\n");
 
-    printf("\nEnter foundation balance: $");
-    scanf("%f", &artarr[acurr].foundation[fcurr].balance);
+    printf("Enter selection: ");
+    scanf("%d", &pick);
 
-    fprintf(ffp,"%d %s $%.2f\n", artarr[acurr].foundation[fcurr].fAccountNum, artarr[acurr].foundation[fcurr].majorCurCharity, artarr[acurr].foundation[fcurr].balance);
-    fclose(ffp);
-
-    return;   
+    return pick;
 }
 
-void updateartist()
+void addBooking(int acurr)
 {
-    printf("1. Add booking\n");
-    printf("2. Update Booking\n");
+    int i, bn;
+    char yn;
+
+    bcurr = acurr;
+
+    printf("\nEnter the number of bookings: ");
+    scanf("%d", &bn);
+
+    for(i=0; i<bn; i++)
+    {
+        artarr[acurr].booking[bcurr].bookingNum = i;
+
+        printf("\nEnter booking type (L)ocal or (O)verseas: ");
+        fflush(stdin);
+        scanf("%c", &artarr[acurr].booking[bcurr].type);
+
+        while((toupper(artarr[acurr].booking[bcurr].type) != 'L') && (toupper(artarr[acurr].booking[bcurr].type) != 'O'))
+        {
+            printf("\nInvalid entry. (Y)es/ (N)o: ");
+            fflush(stdin);
+            scanf("%c", &artarr[acurr].booking[bcurr].type);
+        }
+
+        if(toupper(artarr[acurr].booking[bcurr].type) == 'L')
+        {
+            printf("\nIs this a voluntary booking? (Y)es/(N)o: ");
+            fflush(stdin);
+            scanf("%c", &yn);
+            
+            while((toupper(yn) != 'Y') && (toupper(yn) != 'N'))
+            {
+                printf("\nInvalid entry. (Y)es/ (N)o: ");
+                fflush(stdin);
+                scanf("%c", &yn);
+            }
+
+            if(toupper(yn) == 'Y')
+            {
+                artarr[acurr].booking[bcurr].rateinfo.lrate = 0;
+            }
+            else
+            {
+                printf("Enter the local rate amount: $");
+                scanf("%f", &artarr[acurr].booking[bcurr].rateinfo.lrate);
+            }
+        }
+        else
+        {
+            printf("Enter the overseas rate amount: $");
+            scanf("%f", &artarr[acurr].booking[bcurr].rateinfo.orate);
+
+            printf("Enter booking location: ");
+            scanf("%s", artarr[acurr].booking[bcurr].location);
+
+            printf("Enter booking hotel: ");
+            scanf("%s", artarr[acurr].booking[bcurr].hotel);
+
+            printf("Enter booking guide: ");
+            scanf("%s", artarr[acurr].booking[bcurr].guide);
+
+            printf("Enter booking flight info: ");
+            scanf("%s", artarr[acurr].booking[bcurr].flightInfo);
+
+            printf("Enter booking date\nDD MM YYYY\n");
+            scanf("%d %d %d", &artarr[acurr].booking[bcurr].day, &artarr[acurr].booking[bcurr].month, &artarr[acurr].booking[bcurr].year);
+
+            
+            while ((artarr[acurr].booking[bcurr].day < 1) || (artarr[acurr].booking[bcurr].day > 31))
+			{
+				printf("\n\aInvalid entry.\n");
+				printf("DD : ");
+				scanf("%d", &artarr[acurr].booking[bcurr].day);	
+			} //endwhile
+	
+			while ((artarr[acurr].booking[bcurr].month > 12)||(artarr[acurr].booking[bcurr].month < 1))
+			{
+				printf("\n\aInvalid entry.\n");
+				printf("MM : ");
+				scanf("%d", &artarr[acurr].booking[bcurr].month);	
+			} //endwhile
+			
+			while (artarr[acurr].booking[bcurr].year < 2019)
+			{
+				printf("\n\aInvalid entry.\n");
+				printf("YEAR : ");
+				scanf("%d", &artarr[acurr].booking[bcurr].year);	
+			} //endwhile
+
+        }
+
+    }
 
 }
 
@@ -438,14 +552,20 @@ void storeRec(int a)
 {
     int i;
     afp = fopen("ArtistInfo.txt","a");
+    bfp = fopen("BookingFile.txt", "a");
 	
     if((afp==NULL))
 		printf("The file is not opened.\n");
 	else
         for(i=a; i<acurr; i++)
 		    fprintf(afp,"%d %s %s %s %d $%.2f $%.2f %d %s $%.2f\n", artarr[i].accountNum, artarr[i].fName, artarr[i].lName, artarr[i].stageName, artarr[i].telephone, artarr[i].earningPerYr, artarr[i].accountBal, artarr[i].foundation[i].fAccountNum, artarr[i].foundation[i].majorCurCharity, artarr[i].foundation[i].balance);
-        
+    
+    for (i=a; i<acurr; i++)
+        fprintf(bfp,"%d %c $%.2f %s %s %s %s %d %d %d\n", artarr[i].booking[i].bookingNum, artarr[i].booking[i].type, artarr[i].booking[i].rateinfo, artarr[i].booking[i].location, artarr[i].booking[i].hotel, artarr[i].booking[i].guide, artarr[i].booking[i].flightInfo, artarr[i].booking[i].day, artarr[i].booking[i].month, artarr[i].booking[i].year);
+    
+
 	fclose(afp);
+    fclose(bfp);
 }
 
 void loadRec()
